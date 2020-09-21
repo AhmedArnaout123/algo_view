@@ -1,41 +1,61 @@
 import 'dart:math' as math;
 
 import 'package:algo_view/heap_sort/fixed_circle.dart';
+import 'package:algo_view/heap_sort/line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+typedef OnTreeCreated = void Function(CompleteBinaryTreeController);
+
 class CompleteBinaryTree extends StatefulWidget {
   final List<int> initialItems;
+  final OnTreeCreated onTreeCreated;
 
-  CompleteBinaryTree({this.initialItems});
+  CompleteBinaryTree({this.initialItems, this.onTreeCreated});
 
   @override
   _CompleteBinaryTreeState createState() => _CompleteBinaryTreeState();
 }
 
-class _CompleteBinaryTreeState extends State<CompleteBinaryTree> {
+class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
+    with SingleTickerProviderStateMixin {
   //how many nodes in the tree
   int treeSize;
 
   List<int> treeItems;
 
+  ///list to holdes the center coordinates for every node
   List<Offset> nodesCenters;
 
   double nodeRadius;
 
+  List<GlobalKey> nodesTextGlobalKeys;
+
+  List<Offset> nodesTextOffset;
+
   ///how many levels in the tree, starts from 0
-  int levelsNumber;
-  @override
-  void initState() {
-    super.initState();
-  }
+  int treeLevels;
+
+  AnimationController _animationController;
+  Duration _animationDuration;
+
+  CompleteBinaryTreeController treeController;
 
   //method that calc log2(x)
-  int log2(int x) => (math.log(x) / math.ln2).ceil();
+  int log2(int x) {
+    double val = (math.log(x) / math.ln2);
+    if (val.ceil() == val.floor()) {
+      return val.toInt() + 1;
+    }
+    return val.ceil();
+  }
 
   ///
-  //the size of a specific level
-  int levelSizeCalc(int levelNumber) => math.pow(2, levelNumber).toInt();
+  //the capacity of a specific level
+  int levelCapacityCalculator(int levelNumber) =>
+      math.pow(2, levelNumber).toInt();
+
+  int get lastLevelSize => treeSize - treeSizeUntilLeve(treeLevels - 1);
 
   ///tree size (i.e nodes number) until a specific level
   ///it represents the sum of the levels sizes from level 0 to
@@ -43,7 +63,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree> {
   int treeSizeUntilLeve(int levelNumber) {
     int size = 0;
     for (int i = 0; i <= levelNumber; i++) {
-      size += levelSizeCalc(i);
+      size += levelCapacityCalculator(i);
     }
     return size;
   }
@@ -53,22 +73,51 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree> {
   ///has exactly two childs and it's diffrenet from the tree size
   ///which refere to the acutal number of nodes in the tree.
   ///so the size of such a full tree is given by
-  ///   2^0    +       2^1     + ..... + 2^levelsNumber
+  ///   2^0    +       2^1     + ..... + 2^treeLevels
   ///level 0 size, level 1 size, .....,  level n size
   ///and this is a popular series which has simple formula.
   int get fullTreeSize =>
-      (((1 - math.pow(2, levelsNumber + 1)) / (1 - 2))).floor();
+      (((1 - math.pow(2, treeLevels + 1)) / (1 - 2))).floor();
+
+  void swipeItems(int i1, i2) {
+    var t = treeItems[i1];
+    treeItems[i1] = treeItems[i2];
+    treeItems[i2] = t;
+  }
+
+  void initializeTreeProperties() {
+    treeItems = widget.initialItems;
+    treeSize = treeItems.length;
+    treeLevels = log2(treeSize) - 1;
+    nodesCenters = List(fullTreeSize);
+    nodesTextGlobalKeys = List.generate(treeSize, (_) => GlobalKey());
+    nodesTextOffset = List.generate(treeSize, (index) => Offset.zero);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initializeTreeProperties();
+    _animationDuration = Duration(milliseconds: 500);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: _animationDuration,
+    );
+    treeController = CompleteBinaryTreeController(this);
+    widget.onTreeCreated(treeController);
+  }
+
+  @override
+  void didUpdateWidget(CompleteBinaryTree oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    initializeTreeProperties();
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      print(constraints.maxHeight);
-      treeItems = widget.initialItems;
-      treeSize = treeItems.length;
-      levelsNumber = log2(treeSize) - 1;
-
       ///how many nodes in the last level
-      int lastLevelSize = levelSizeCalc(levelsNumber);
+      int lastLevelCapacity = levelCapacityCalculator(treeLevels);
 
       ///distance between two nodes in the last level(i.e between to brothers)
       int lastLevelTwoNodesDistance = 10;
@@ -79,13 +128,13 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree> {
 
       ///half last level size will decide how many times we will put
       ///distance betwee two nodes or two paires
-      int halfLastLevelSize = (lastLevelSize / 2).floor();
+      int halflastLevelCapacity = (lastLevelCapacity / 2).floor();
 
       ///how many times we will put distance between two nodes
-      int twoNodesDistanceNumber = halfLastLevelSize;
+      int twoNodesDistanceNumber = halflastLevelCapacity;
 
       ///how many times we will put distance betwwen two paires
-      int twoPairsDistanceNumber = halfLastLevelSize - 1;
+      int twoPairsDistanceNumber = halflastLevelCapacity - 1;
 
       ///calculating the radius:
       ///we take the whole width, subtruct from it all distances between
@@ -95,11 +144,8 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree> {
       nodeRadius = ((constraints.maxWidth -
                   (twoNodesDistanceNumber * lastLevelTwoNodesDistance) -
                   (lastLevelTwoPairsDistance * twoPairsDistanceNumber)) /
-              lastLevelSize) /
+              lastLevelCapacity) /
           2;
-
-      ///list to holdes the center coordinates for every node
-      nodesCenters = List(fullTreeSize);
 
       ///last node center
       nodesCenters[nodesCenters.length - 1] = Offset(
@@ -112,25 +158,25 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree> {
 
       ///calculate the center of the rest nodes at last level
       {
-        Offset lastNodeOrigin = nodesCenters.last;
-        double dy = lastNodeOrigin.dy;
+        Offset lastNodeCenter = nodesCenters.last;
+        double dy = lastNodeCenter.dy;
         int x = lastLevelTwoNodesDistance;
-        int xAxisChangesTodistance = 0;
-        for (int i = 1; i <= lastLevelSize - 1; i++) {
-          xAxisChangesTodistance += i.isOdd ? x : 2 * x;
-          double dx =
-              lastNodeOrigin.dx - (xAxisChangesTodistance + i * 2 * nodeRadius);
+        int xAxisShift = 0;
+        for (int i = 1; i <= lastLevelCapacity - 1; i++) {
+          xAxisShift += i.isOdd ? x : 2 * x;
+          double dx = lastNodeCenter.dx - (xAxisShift + i * 2 * nodeRadius);
           nodesCenters[--nodesCentersItrator] = Offset(dx, dy);
         }
       }
 
       //calculate the centers for the rest nodes/
       {
-        print(nodesCentersItrator);
-        var levelNumber = levelsNumber - 1;
-        var levelSize = levelSizeCalc(levelNumber);
-        print(levelNumber);
-        double dy = nodesCenters[nodesCentersItrator].dy - 50;
+        double heightBetweenTwoLevels =
+            (constraints.maxHeight - 2 * nodeRadius) / treeLevels;
+        var levelNumber = treeLevels - 1;
+        var levelSize = levelCapacityCalculator(levelNumber);
+        double dy =
+            nodesCenters[nodesCentersItrator].dy - heightBetweenTwoLevels;
         for (int i = 1; i <= levelSize && levelNumber > -1; i++) {
           int parentIndex = --nodesCentersItrator;
           int leftChild = 2 * parentIndex + 1;
@@ -139,40 +185,146 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree> {
               (nodesCenters[leftChild].dx + nodesCenters[rightChild].dx) / 2;
           nodesCenters[parentIndex] = Offset(dx, dy);
           if (i == levelSize) {
-            print('hello');
             levelNumber--;
-            levelSize = levelSizeCalc(levelNumber);
-            dy -= 75;
+            levelSize = levelCapacityCalculator(levelNumber);
+            dy -= heightBetweenTwoLevels;
             i = 0;
           }
         }
       }
-      print(nodesCenters);
+
       return Stack(
         children: <Widget>[
           Container(
             color: Colors.blue,
           ),
-          Transform.translate(
-            offset: Offset(constraints.maxWidth.floor().toDouble() - nodeRadius,
-                constraints.maxHeight.floor().toDouble() - nodeRadius),
-            child: Container(
-              height: 1,
-              width: 1,
-              color: Colors.black,
-            ),
-          ),
-          ...treeItems.map((i) {
-            if (i == null)
-              return Container();
-            else
-              return FixedCircle(
-                center: nodesCenters[nodesCentersItrator++],
-                radius: nodeRadius,
-              );
-          }).toList()
+          ...treeItems
+              .asMap()
+              .map((index, item) {
+                return MapEntry(
+                    index,
+                    FixedCircle(
+                      center: nodesCenters[index],
+                      radius: nodeRadius,
+                      child: Center(
+                        child: FittedBox(
+                          child: Transform.translate(
+                            offset: nodesTextOffset[index],
+                            child: Text(treeItems[index].toString()),
+                          ),
+                          key: nodesTextGlobalKeys[index],
+                        ),
+                      ),
+                    ));
+              })
+              .values
+              .toList(),
+          ...nodesCenters
+              .asMap()
+              .map<int, Widget>((key, value) {
+                if (key >= levelCapacityCalculator(treeLevels) - 1) {
+                  return MapEntry(key, Container());
+                }
+                var maxHeight = nodesCenters[2 * key + 1].dy - value.dy;
+                var maxWidth = (nodesCenters[2 * key + 2].dx + nodeRadius) -
+                    (nodesCenters[2 * key + 1].dx - nodeRadius);
+                return MapEntry(
+                  key,
+                  Positioned(
+                    left: nodesCenters[key * 2 + 1].dx - nodeRadius,
+                    top: value.dy + nodeRadius,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: maxHeight,
+                        maxWidth: maxWidth,
+                      ),
+                      child: Stack(
+                        children: [
+                          Container(
+                            color: Colors.orange.withOpacity(0.2),
+                          ),
+                          Positioned(
+                            left: maxWidth / 2,
+                            child: 2 * key + 1 < treeSize
+                                ? Line(
+                                    color: Colors.black,
+                                    start:
+                                        Offset(value.dx, value.dy + nodeRadius),
+                                    end: Offset(
+                                      nodesCenters[2 * key + 2].dx,
+                                      nodesCenters[2 * key + 2].dy - nodeRadius,
+                                    ),
+                                  )
+                                : Container(),
+                          ),
+                          Positioned(
+                            left: maxWidth / 2,
+                            child: 2 * key + 2 < treeSize
+                                ? Line(
+                                    color: Colors.black,
+                                    start:
+                                        Offset(value.dx, value.dy + nodeRadius),
+                                    end: Offset(
+                                      nodesCenters[2 * key + 1].dx,
+                                      nodesCenters[2 * key + 1].dy - nodeRadius,
+                                    ),
+                                  )
+                                : Container(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              })
+              .values
+              .toList()
         ],
       );
     });
+  }
+}
+
+class CompleteBinaryTreeController {
+  _CompleteBinaryTreeState _state;
+  CompleteBinaryTreeController(this._state) {}
+  Future<void> swipeItems(int index1, int index2) async {
+    RenderBox child1Box =
+        _state.nodesTextGlobalKeys[index1].currentContext.findRenderObject();
+    var child1Offset = child1Box.localToGlobal(Offset.zero);
+    RenderBox child2Box =
+        _state.nodesTextGlobalKeys[index2].currentContext.findRenderObject();
+    var child2Offset = child2Box.localToGlobal(Offset.zero);
+    Animation<Offset> animation =
+        Tween<Offset>(begin: child1Offset, end: child2Offset)
+            .animate(_state._animationController);
+    void listner() {
+      child1Box =
+          _state.nodesTextGlobalKeys[index1].currentContext.findRenderObject();
+      child2Box =
+          _state.nodesTextGlobalKeys[index2].currentContext.findRenderObject();
+      var dx = animation.value.dx - child1Offset.dx;
+      var dy = animation.value.dy - child1Offset.dy;
+      child1Offset = animation.value;
+      child2Offset = child2Offset - Offset(dx, dy);
+      _state.setState(() {
+        _state.nodesTextOffset[index1] = child1Box.globalToLocal(child1Offset);
+        _state.nodesTextOffset[index2] = child2Box.globalToLocal(child2Offset);
+      });
+    }
+
+    _state._animationController.addListener(listner);
+
+    await _state._animationController.forward();
+
+    _state.setState(() {
+      _state.swipeItems(index1, index2);
+      _state.nodesTextOffset[index1] = Offset.zero;
+      _state.nodesTextOffset[index2] = Offset.zero;
+    });
+
+    _state._animationController.removeListener(listner);
+
+    _state._animationController.reset();
   }
 }

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class FixedCircle extends StatelessWidget {
   final Offset center;
   final double radius;
+  final Widget child;
 
-  const FixedCircle({Key key, this.center, this.radius}) : super(key: key);
+  const FixedCircle({Key key, this.center, this.radius, this.child})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Transform.translate(
@@ -15,6 +17,7 @@ class FixedCircle extends StatelessWidget {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(radius),
               border: Border.all(width: 0.5)),
+          child: child,
         ));
   }
 }
