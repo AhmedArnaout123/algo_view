@@ -1,3 +1,5 @@
+import 'package:algo_view/heap_sort/animatable_array.dart';
+import 'package:algo_view/heap_sort/comparing_indicator.dart';
 import 'package:algo_view/heap_sort/complete_binary_tree.dart';
 import 'package:algo_view/heap_sort/heap_sort.dart';
 import 'package:algo_view/heap_sort/line.dart';
@@ -24,7 +26,8 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int treeSize = 8;
   List<int> items;
-  CompleteBinaryTreeController _controller;
+  CompleteBinaryTreeController treeController;
+  AnimatableArrayController arrayController;
   @override
   void initState() {
     super.initState();
@@ -96,13 +99,25 @@ class _HomePageState extends State<HomePage>
               child: CompleteBinaryTree(
                 initialItems: items,
                 onTreeCreated: (c) {
-                  _controller = c;
+                  treeController = c;
                 },
               ),
             ),
+            AnimatableArray(
+              items: items,
+              onArrayCreated: (c) {
+                arrayController = c;
+              },
+              animationDuration: Duration(milliseconds: 1000),
+            ),
             RaisedButton(
               onPressed: () async {
-                await _controller.hideLastNode();
+                int index1 = math.Random().nextInt(treeSize);
+                int index2 = math.Random().nextInt(treeSize);
+                treeController.showComparingIndicators(index1, index2);
+                await Future.delayed(Duration(seconds: 2));
+                treeController.hideComparingIndicators(index1, index2);
+                await arrayController.swipeItems(index1, index2);
               },
             ),
           ],

@@ -322,7 +322,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
 
 class CompleteBinaryTreeController {
   _CompleteBinaryTreeState _state;
-  CompleteBinaryTreeController(this._state) {}
+  CompleteBinaryTreeController(this._state);
   Future<void> swipeItems(int index1, int index2) async {
     RenderBox child1Box =
         _state.nodesTextGlobalKeys[index1].currentContext.findRenderObject();
