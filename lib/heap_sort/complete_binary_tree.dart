@@ -33,6 +33,10 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
 
   List<Offset> nodesTextOffset;
 
+  List<double> nodesOpacity;
+
+  int nodesOpacityTracker;
+
   ///how many levels in the tree, starts from 0
   int treeLevels;
 
@@ -91,7 +95,9 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
     treeLevels = log2(treeSize) - 1;
     nodesCenters = List(fullTreeSize);
     nodesTextGlobalKeys = List.generate(treeSize, (_) => GlobalKey());
-    nodesTextOffset = List.generate(treeSize, (index) => Offset.zero);
+    nodesTextOffset = List.generate(treeSize, (_) => Offset.zero);
+    nodesOpacity = List.generate(treeSize, (_) => 1);
+    nodesOpacityTracker = nodesOpacity.length - 1;
   }
 
   @override
@@ -203,16 +209,19 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
               .map((index, item) {
                 return MapEntry(
                     index,
-                    FixedCircle(
-                      center: nodesCenters[index],
-                      radius: nodeRadius,
-                      child: Center(
-                        child: FittedBox(
-                          child: Transform.translate(
-                            offset: nodesTextOffset[index],
-                            child: Text(treeItems[index].toString()),
+                    Opacity(
+                      opacity: nodesOpacity[index],
+                      child: FixedCircle(
+                        center: nodesCenters[index],
+                        radius: nodeRadius,
+                        child: Center(
+                          child: FittedBox(
+                            child: Transform.translate(
+                              offset: nodesTextOffset[index],
+                              child: Text(treeItems[index].toString()),
+                            ),
+                            key: nodesTextGlobalKeys[index],
                           ),
-                          key: nodesTextGlobalKeys[index],
                         ),
                       ),
                     ));
@@ -245,7 +254,8 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                           ),
                           Positioned(
                             left: maxWidth / 2,
-                            child: 2 * key + 1 < treeSize
+                            child: 2 * key + 1 < treeSize &&
+                                    nodesOpacity[2 * key + 1] == 1
                                 ? Line(
                                     color: Colors.black,
                                     start:
@@ -259,7 +269,8 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                           ),
                           Positioned(
                             left: maxWidth / 2,
-                            child: 2 * key + 2 < treeSize
+                            child: 2 * key + 2 < treeSize &&
+                                    nodesOpacity[2 * key + 2] == 1
                                 ? Line(
                                     color: Colors.black,
                                     start:
@@ -326,5 +337,14 @@ class CompleteBinaryTreeController {
     _state._animationController.removeListener(listner);
 
     _state._animationController.reset();
+  }
+
+  Future<void> hideLastNode() {
+    if (_state.nodesOpacityTracker < 0) {
+      return Future(() {});
+    }
+    _state.setState(() {
+      _state.nodesOpacity[_state.nodesOpacityTracker--] = 0;
+    });
   }
 }

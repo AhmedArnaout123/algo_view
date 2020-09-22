@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage>
             ),
             RaisedButton(
               onPressed: () async {
-                await _controller.swipeItems(2, 9);
+                await _controller.hideLastNode();
               },
             ),
           ],
