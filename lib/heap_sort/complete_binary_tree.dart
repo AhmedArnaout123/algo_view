@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:algo_view/heap_sort/comparing_indicator.dart';
 import 'package:algo_view/heap_sort/fixed_circle.dart';
 import 'package:algo_view/heap_sort/line.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,8 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
   List<double> nodesOpacity;
 
   int nodesOpacityTracker;
+
+  List<bool> nodesComapringIndicators;
 
   ///how many levels in the tree, starts from 0
   int treeLevels;
@@ -98,6 +101,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
     nodesTextOffset = List.generate(treeSize, (_) => Offset.zero);
     nodesOpacity = List.generate(treeSize, (_) => 1);
     nodesOpacityTracker = nodesOpacity.length - 1;
+    nodesComapringIndicators = List.generate(treeSize, (_) => false);
   }
 
   @override
@@ -208,23 +212,25 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
               .asMap()
               .map((index, item) {
                 return MapEntry(
-                    index,
-                    Opacity(
-                      opacity: nodesOpacity[index],
-                      child: FixedCircle(
-                        center: nodesCenters[index],
-                        radius: nodeRadius,
-                        child: Center(
-                          child: FittedBox(
-                            child: Transform.translate(
-                              offset: nodesTextOffset[index],
-                              child: Text(treeItems[index].toString()),
-                            ),
-                            key: nodesTextGlobalKeys[index],
+                  index,
+                  Opacity(
+                    opacity: nodesOpacity[index],
+                    child: FixedCircle(
+                      center: nodesCenters[index],
+                      radius: nodeRadius,
+                      border: Border.all(width: 1),
+                      child: Center(
+                        child: FittedBox(
+                          child: Transform.translate(
+                            offset: nodesTextOffset[index],
+                            child: Text(treeItems[index].toString()),
                           ),
+                          key: nodesTextGlobalKeys[index],
                         ),
                       ),
-                    ));
+                    ),
+                  ),
+                );
               })
               .values
               .toList(),
@@ -289,6 +295,24 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                 );
               })
               .values
+              .toList(),
+          ...nodesComapringIndicators
+              .asMap()
+              .map((key, value) {
+                return MapEntry(
+                    key,
+                    value
+                        ? FixedCircle(
+                            center: nodesCenters[key],
+                            radius: nodeRadius + 3,
+                            child: ComparingIndicator(
+                              nodeDiameter: 2 * nodeRadius,
+                              borderWidth: 3,
+                            ),
+                          )
+                        : Container());
+              })
+              .values
               .toList()
         ],
       );
@@ -339,12 +363,26 @@ class CompleteBinaryTreeController {
     _state._animationController.reset();
   }
 
-  Future<void> hideLastNode() {
+  void hideLastNode() {
     if (_state.nodesOpacityTracker < 0) {
-      return Future(() {});
+      return;
     }
     _state.setState(() {
       _state.nodesOpacity[_state.nodesOpacityTracker--] = 0;
+    });
+  }
+
+  void showComparingIndicators(int index1, int index2) {
+    _state.setState(() {
+      _state.nodesComapringIndicators[index1] = true;
+      _state.nodesComapringIndicators[index2] = true;
+    });
+  }
+
+  void hideComparingIndicators(int index1, int index2) {
+    _state.setState(() {
+      _state.nodesComapringIndicators[index1] = false;
+      _state.nodesComapringIndicators[index2] = false;
     });
   }
 }
