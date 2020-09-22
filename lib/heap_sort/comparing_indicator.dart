@@ -48,4 +48,11 @@ class _ComparingIndicatorState extends State<ComparingIndicator>
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _controller.stop();
+    super.dispose();
+    _controller.dispose();
+  }
 }
