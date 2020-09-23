@@ -3,12 +3,20 @@ import 'package:flutter/material.dart';
 enum ComparingIndicatorShape { Circle, Rectangle }
 
 class ComparingIndicator extends StatefulWidget {
+  @required
   final double height;
-  final double width;
+  @required
   final double borderWidth;
+  final double width;
   final ComparingIndicatorShape shape;
+  final Duration animationDuration;
   const ComparingIndicator(
-      {Key key, this.borderWidth, this.height, this.width, this.shape})
+      {Key key,
+      this.borderWidth,
+      this.height,
+      this.width,
+      this.shape,
+      this.animationDuration})
       : super(key: key);
   @override
   _ComparingIndicatorState createState() => _ComparingIndicatorState();
@@ -23,7 +31,7 @@ class _ComparingIndicatorState extends State<ComparingIndicator>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 600),
+      duration: widget.animationDuration ?? Duration(milliseconds: 400),
       lowerBound: 0.3,
       upperBound: 1,
     );
