@@ -93,7 +93,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
   }
 
   void initializeTreeProperties() {
-    treeItems = widget.initialItems;
+    treeItems = List.from(widget.initialItems);
     treeSize = treeItems.length;
     treeLevels = log2(treeSize) - 1;
     nodesCenters = List(fullTreeSize);
@@ -306,8 +306,9 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                             center: nodesCenters[key],
                             radius: nodeRadius + 3,
                             child: ComparingIndicator(
-                              nodeDiameter: 2 * nodeRadius,
+                              height: 2 * nodeRadius,
                               borderWidth: 3,
+                              shape: ComparingIndicatorShape.Circle,
                             ),
                           )
                         : Container());

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ComparingIndicator extends StatefulWidget {
-  final double nodeDiameter;
-  final double borderWidth;
+enum ComparingIndicatorShape { Circle, Rectangle }
 
-  const ComparingIndicator({Key key, this.nodeDiameter, this.borderWidth})
+class ComparingIndicator extends StatefulWidget {
+  final double height;
+  final double width;
+  final double borderWidth;
+  final ComparingIndicatorShape shape;
+  const ComparingIndicator(
+      {Key key, this.borderWidth, this.height, this.width, this.shape})
       : super(key: key);
   @override
   _ComparingIndicatorState createState() => _ComparingIndicatorState();
@@ -28,6 +32,7 @@ class _ComparingIndicatorState extends State<ComparingIndicator>
 
   @override
   Widget build(BuildContext context) {
+    bool isCircleShape = widget.shape == ComparingIndicatorShape.Circle;
     return AnimatedBuilder(
       animation: _controller,
       builder: (_, child) => Opacity(
@@ -35,11 +40,13 @@ class _ComparingIndicatorState extends State<ComparingIndicator>
         child: child,
       ),
       child: Container(
-        height: widget.nodeDiameter + widget.borderWidth,
-        width: widget.nodeDiameter + widget.borderWidth,
+        height: widget.height + widget.borderWidth,
+        width:
+            (isCircleShape ? widget.height : widget.width) + widget.borderWidth,
         decoration: BoxDecoration(
-          borderRadius:
-              BorderRadius.circular(widget.nodeDiameter + widget.borderWidth),
+          borderRadius: BorderRadius.circular(
+            isCircleShape ? (widget.height + widget.borderWidth) : 0,
+          ),
           border: Border.all(
             width: widget.borderWidth,
             color: Colors.red,
