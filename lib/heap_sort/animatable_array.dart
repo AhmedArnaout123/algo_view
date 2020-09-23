@@ -1,3 +1,4 @@
+import 'package:algo_view/heap_sort/comparing_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
@@ -24,10 +25,10 @@ class _AnimatableArrayState extends State<AnimatableArray>
   List<Offset> nodesTextOffset;
 
   AnimationController _animationController;
-  List<Animation<Offset>> _animation;
   AnimatableArrayController controller;
   List<double> dxOffsets;
   List<double> dyOffsets;
+  List<bool> comparingIndicators;
 
   void swipeItems(int i1, i2) {
     var t = items[i1];
@@ -41,14 +42,9 @@ class _AnimatableArrayState extends State<AnimatableArray>
     nodesTextGlobalKeys = List.generate(size, (_) => GlobalKey());
     nodesTextOffset = List.generate(size, (_) => Offset.zero);
     widget.onArrayCreated(controller);
-    _animation = List.generate(
-      size,
-      (_) => Tween<Offset>(begin: Offset.zero, end: Offset.zero).animate(
-        _animationController,
-      ),
-    );
     dxOffsets = List.generate(size, (_) => 0);
     dyOffsets = List.generate(size, (_) => 0);
+    comparingIndicators = List.generate(size, (_) => false);
   }
 
   @override
@@ -92,27 +88,33 @@ class _AnimatableArrayState extends State<AnimatableArray>
                           child: Text('${k.toString()}'),
                         ),
                         Container(
+                          width: 50,
+                          height: 25,
                           decoration: BoxDecoration(
-                              border:
-                                  Border.all(width: 0, color: Colors.purple)),
-                          padding: EdgeInsets.symmetric(vertical: 0),
-                          child: Container(
-                            width: 50,
-                            padding: EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              border: Border.all(width: 1),
-                            ),
-                            alignment: Alignment.center,
-                            child: Container(
-                              child: Transform(
-                                transform: Matrix4.translation(
-                                    Vector3(dxOffsets[k], dyOffsets[k], 0)),
-                                child: Text(
-                                  items[k].toString(),
-                                  key: nodesTextGlobalKeys[k],
+                            border: Border.all(width: 1),
+                          ),
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Transform(
+                                  transform: Matrix4.translation(
+                                      Vector3(dxOffsets[k], dyOffsets[k], 0)),
+                                  child: Text(
+                                    items[k].toString(),
+                                    key: nodesTextGlobalKeys[k],
+                                  ),
                                 ),
                               ),
-                            ),
+                              if (comparingIndicators[k])
+                                LayoutBuilder(
+                                  builder: (_, c) => ComparingIndicator(
+                                    borderWidth: 2,
+                                    height: c.maxHeight,
+                                    width: c.maxWidth,
+                                    shape: ComparingIndicatorShape.Rectangle,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ],
@@ -175,5 +177,19 @@ class AnimatableArrayController {
       _state.dyOffsets[index2] = 0;
     });
     _state._animationController.reset();
+  }
+
+  void showComparingIndicators(int index1, int index2) {
+    _state.setState(() {
+      _state.comparingIndicators[index1] = true;
+      _state.comparingIndicators[index2] = true;
+    });
+  }
+
+  void hideComparingIndicators(int index1, int index2) {
+    _state.setState(() {
+      _state.comparingIndicators[index1] = false;
+      _state.comparingIndicators[index2] = false;
+    });
   }
 }

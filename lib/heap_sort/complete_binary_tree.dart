@@ -108,7 +108,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
   void initState() {
     super.initState();
     initializeTreeProperties();
-    _animationDuration = Duration(milliseconds: 500);
+    _animationDuration = Duration(milliseconds: 200);
     _animationController = AnimationController(
       vsync: this,
       duration: _animationDuration,
