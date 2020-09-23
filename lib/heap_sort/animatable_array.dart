@@ -6,10 +6,16 @@ typedef OnArrayCreated = void Function(AnimatableArrayController);
 
 class AnimatableArray extends StatefulWidget {
   final List<int> items;
-  final Duration animationDuration;
+  final Duration swipingDuration;
+  final Duration comparingIndicatorDuration;
   final OnArrayCreated onArrayCreated;
+
   const AnimatableArray(
-      {Key key, this.items, this.animationDuration, this.onArrayCreated})
+      {Key key,
+      this.items,
+      this.swipingDuration,
+      this.onArrayCreated,
+      this.comparingIndicatorDuration})
       : super(key: key);
   @override
   _AnimatableArrayState createState() => _AnimatableArrayState();
@@ -53,7 +59,7 @@ class _AnimatableArrayState extends State<AnimatableArray>
     controller = AnimatableArrayController(this);
     _animationController = AnimationController(
       vsync: this,
-      duration: widget.animationDuration,
+      duration: widget.swipingDuration,
     );
     initializeAraayProperties();
   }
@@ -112,6 +118,8 @@ class _AnimatableArrayState extends State<AnimatableArray>
                                     height: c.maxHeight,
                                     width: c.maxWidth,
                                     shape: ComparingIndicatorShape.Rectangle,
+                                    animationDuration:
+                                        widget.comparingIndicatorDuration,
                                   ),
                                 ),
                             ],

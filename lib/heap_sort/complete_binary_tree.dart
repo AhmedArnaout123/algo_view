@@ -9,10 +9,17 @@ import 'package:flutter/rendering.dart';
 typedef OnTreeCreated = void Function(CompleteBinaryTreeController);
 
 class CompleteBinaryTree extends StatefulWidget {
-  final List<int> initialItems;
+  final List<int> items;
   final OnTreeCreated onTreeCreated;
+  final Duration swipingAnimationDuration;
+  final Duration comparingIndicatorDuration;
 
-  CompleteBinaryTree({this.initialItems, this.onTreeCreated});
+  CompleteBinaryTree({
+    this.items,
+    this.onTreeCreated,
+    this.swipingAnimationDuration,
+    this.comparingIndicatorDuration,
+  });
 
   @override
   _CompleteBinaryTreeState createState() => _CompleteBinaryTreeState();
@@ -93,7 +100,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
   }
 
   void initializeTreeProperties() {
-    treeItems = List.from(widget.initialItems);
+    treeItems = List.from(widget.items);
     treeSize = treeItems.length;
     treeLevels = log2(treeSize) - 1;
     nodesCenters = List(fullTreeSize);
@@ -108,7 +115,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
   void initState() {
     super.initState();
     initializeTreeProperties();
-    _animationDuration = Duration(milliseconds: 200);
+    _animationDuration = widget.swipingAnimationDuration;
     _animationController = AnimationController(
       vsync: this,
       duration: _animationDuration,
@@ -309,6 +316,8 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                               height: 2 * nodeRadius,
                               borderWidth: 3,
                               shape: ComparingIndicatorShape.Circle,
+                              animationDuration:
+                                  widget.comparingIndicatorDuration,
                             ),
                           )
                         : Container());
