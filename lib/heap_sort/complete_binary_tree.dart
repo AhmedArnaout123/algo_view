@@ -212,9 +212,9 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
 
       return Stack(
         children: <Widget>[
-          Container(
-            color: Colors.blue,
-          ),
+          // Container(
+          //   color: Colors.blue,
+          // ),
           ...treeItems
               .asMap()
               .map((index, item) {
@@ -262,9 +262,9 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                       ),
                       child: Stack(
                         children: [
-                          Container(
-                            color: Colors.orange.withOpacity(0.2),
-                          ),
+                          // Container(
+                          //   color: Colors.orange.withOpacity(0.2),
+                          // ),
                           Positioned(
                             left: maxWidth / 2,
                             child: 2 * key + 1 < treeSize &&

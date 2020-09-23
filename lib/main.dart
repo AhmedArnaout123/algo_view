@@ -1,8 +1,5 @@
 import 'package:algo_view/heap_sort/animatable_array.dart';
-import 'package:algo_view/heap_sort/comparing_indicator.dart';
 import 'package:algo_view/heap_sort/complete_binary_tree.dart';
-import 'package:algo_view/heap_sort/heap_sort.dart';
-import 'package:algo_view/heap_sort/line.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -13,7 +10,10 @@ void main(List<String> args) {
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: HomePage());
+    return MaterialApp(
+      home: HomePage(),
+      debugShowCheckedModeBanner: false,
+    );
   }
 }
 
@@ -29,7 +29,8 @@ class _HomePageState extends State<HomePage>
   CompleteBinaryTreeController treeController;
   AnimatableArrayController arrayController;
   Duration comparingIndicatorDuration = Duration(milliseconds: 400);
-  Duration swipingDuration = Duration(milliseconds: 1000);
+  Duration swipingDuration = Duration(milliseconds: 300);
+  bool isRunning = false;
 
   @override
   void initState() {
@@ -114,100 +115,115 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              color: Color(0xff00003f),
-              child: Row(
-                children: [
-                  Text(
-                    'Size:',
-                    style: TextStyle(color: Colors.white, fontSize: 15),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  DropdownButton<int>(
-                    value: treeSize,
-                    onChanged: (_) {
-                      setState(() {
-                        treeSize = _;
-                        randomizeItems();
-                      });
-                    },
-                    items: List.generate(
-                      14,
-                      (index) => DropdownMenuItem(
-                        value: index + 4,
-                        child: Text((index + 4).toString(),
-                            style: TextStyle(
-                              color: Colors.blueAccent,
-                            )),
-                      ),
+        child: Container(
+          color: Colors.red.withOpacity(0.2),
+          child: ListView(
+            padding: EdgeInsets.all(8),
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Size:',
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        DropdownButton<int>(
+                          value: treeSize,
+                          onChanged: isRunning
+                              ? null
+                              : (_) {
+                                  setState(() {
+                                    treeSize = _;
+                                    randomizeItems();
+                                  });
+                                },
+                          items: List.generate(
+                            14,
+                            (index) => DropdownMenuItem(
+                              value: index + 4,
+                              child: Text((index + 4).toString(),
+                                  style: TextStyle(
+                                    color: Colors.blueAccent,
+                                  )),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
+                    Spacer(
+                      flex: 1,
+                    ),
+                    Flexible(
+                      flex: 4,
+                      fit: FlexFit.tight,
                       child: RaisedButton(
                         color: Colors.yellow,
-                        child: Text('Randomize Items'),
-                        onPressed: () {
-                          setState(() {
-                            randomizeItems();
-                          });
-                        },
+                        child: FittedBox(child: Text('Heap Sort')),
+                        onPressed: isRunning
+                            ? null
+                            : () async {
+                                setState(() {
+                                  isRunning = true;
+                                });
+                                await heapSort(items, 0, items.length - 1);
+                                setState(() {
+                                  isRunning = false;
+                                });
+                              },
                       ),
                     ),
-                  ),
-                  SizedBox(width: 10)
-                ],
+                    Spacer(
+                      flex: 1,
+                    ),
+                    Flexible(
+                      flex: 3,
+                      fit: FlexFit.tight,
+                      child: RaisedButton(
+                        color: Colors.yellow,
+                        child: Icon(Icons.shuffle),
+                        onPressed: isRunning
+                            ? null
+                            : () {
+                                setState(() {
+                                  randomizeItems();
+                                });
+                              },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Container(
-              // padding: EdgeInsets.symmetric(horizontal: 10),
-              height: 300,
-              child: CompleteBinaryTree(
+              SizedBox(height: 10),
+              Container(
+                // padding: EdgeInsets.symmetric(horizontal: 10),
+                height: 300,
+                child: CompleteBinaryTree(
+                  items: items,
+                  onTreeCreated: (c) {
+                    treeController = c;
+                  },
+                  comparingIndicatorDuration: comparingIndicatorDuration,
+                  swipingAnimationDuration: swipingDuration,
+                ),
+              ),
+              SizedBox(height: 20),
+              AnimatableArray(
                 items: items,
-                onTreeCreated: (c) {
-                  treeController = c;
+                onArrayCreated: (c) {
+                  arrayController = c;
                 },
                 comparingIndicatorDuration: comparingIndicatorDuration,
-                swipingAnimationDuration: swipingDuration,
+                swipingDuration: swipingDuration,
               ),
-            ),
-            AnimatableArray(
-              items: items,
-              onArrayCreated: (c) {
-                arrayController = c;
-              },
-              comparingIndicatorDuration: comparingIndicatorDuration,
-              swipingDuration: swipingDuration,
-            ),
-            RaisedButton(
-              onPressed: () async {
-                // int index1 = math.Random().nextInt(treeSize);
-                // int index2 = math.Random().nextInt(treeSize);
-                // treeController.showComparingIndicators(index1, index2);
-                // arrayController.showComparingIndicators(index1, index2);
-                // await Future.delayed(Duration(seconds: 2));
-                // treeController.hideComparingIndicators(index1, index2);
-                // arrayController.hideComparingIndicators(index1, index2);
-                // treeController.swipeItems(index1, index2);
-                // arrayController.swipeItems(index1, index2);
-                // print(items);
-                await heapSort(items, 0, items.length - 1);
-                print("done sorting $items");
-                // for (int i = 0; i < 2; i++) {
-                //   arrayController.swipeItems(0, items.length - 1);
-                //   treeController.swipeItems(0, items.length - 1);
-                //   await Future.delayed(Duration(
-                //       milliseconds: swipingDuration.inMilliseconds + 100));
-                // }
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

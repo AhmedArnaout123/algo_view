@@ -74,7 +74,7 @@ class _AnimatableArrayState extends State<AnimatableArray>
   Widget build(BuildContext context) {
     return Container(
       height: 150,
-      color: Colors.red.withOpacity(0.2),
+      // color: Colors.red.withOpacity(0.2),
       child: Wrap(
         direction: Axis.horizontal,
         spacing: 0,
