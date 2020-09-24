@@ -18,6 +18,8 @@ class App extends StatelessWidget {
   }
 }
 
+enum ComparingIndicatorAction { Show, Hide }
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -44,19 +46,33 @@ class _HomePageState extends State<HomePage>
   }
 
   void swipe(List<int> arr, int i, int j) {
+    arrayController.swipeItems(i, j);
+    treeController.swipeItems(i, j);
     int t = arr[i];
     arr[i] = arr[j];
     arr[j] = t;
   }
 
+  void changeComparingIndicatorStatus(
+    ComparingIndicatorAction action,
+    int i,
+    int j,
+  ) {
+    if (action == ComparingIndicatorAction.Hide) {
+      arrayController.hideComparingIndicators(i, j);
+      treeController.hideComparingIndicators(i, j);
+      return;
+    }
+    arrayController.showComparingIndicators(i, j);
+    treeController.showComparingIndicators(i, j);
+  }
+
   Future<void> heapSort(List<int> arr, int start, int end) async {
     await buildHeapForTree(arr, start, end);
     for (int i = end; i > start; i--) {
-      arrayController.swipeItems(i, start);
-      treeController.swipeItems(i, start);
+      swipe(arr, start, i);
       await Future.delayed(
           Duration(milliseconds: swipingDuration.inMilliseconds + 100));
-      swipe(arr, start, i);
       await buildHeapAtNode(arr, start, i - 1);
     }
   }
@@ -82,29 +98,39 @@ class _HomePageState extends State<HomePage>
       //if the right child is exist and it's larger than the left one
       //change the larger index
       if (right <= end) {
-        arrayController.showComparingIndicators(left, right);
-        treeController.showComparingIndicators(left, right);
+        changeComparingIndicatorStatus(
+          ComparingIndicatorAction.Show,
+          right,
+          left,
+        );
         await Future.delayed(comparingIndicatorDuration);
-        arrayController.hideComparingIndicators(left, right);
-        treeController.hideComparingIndicators(left, right);
+        changeComparingIndicatorStatus(
+          ComparingIndicatorAction.Hide,
+          right,
+          left,
+        );
         if (arr[largerIndex] < arr[right]) {
           largerIndex = right;
         }
       }
-      arrayController.showComparingIndicators(nodeIndex, largerIndex);
-      treeController.showComparingIndicators(nodeIndex, largerIndex);
+      changeComparingIndicatorStatus(
+        ComparingIndicatorAction.Show,
+        nodeIndex,
+        largerIndex,
+      );
       await Future.delayed(comparingIndicatorDuration);
-      arrayController.hideComparingIndicators(nodeIndex, largerIndex);
-      treeController.hideComparingIndicators(nodeIndex, largerIndex);
+      changeComparingIndicatorStatus(
+        ComparingIndicatorAction.Hide,
+        nodeIndex,
+        largerIndex,
+      );
       //compare parent with it's larger child
       if (arr[nodeIndex] < arr[largerIndex]) {
         //the child is larger than  it's parent so we need to swipe then
         //rebuild the heap for the parent in it's new index
-        arrayController.swipeItems(nodeIndex, largerIndex);
-        treeController.swipeItems(nodeIndex, largerIndex);
+        swipe(arr, nodeIndex, largerIndex);
         await Future.delayed(
             Duration(milliseconds: swipingDuration.inMilliseconds + 100));
-        swipe(arr, nodeIndex, largerIndex);
         await buildHeapAtNode(arr, largerIndex, end);
       }
       //the parent is larger than it's larger child so nothing to do
@@ -134,7 +160,6 @@ class _HomePageState extends State<HomePage>
                                 treeSize = value;
                                 randomizeItems();
                               });
-                              print(treeSize);
                             },
                     ),
                     Spacer(
