@@ -41,10 +41,6 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
 
   List<Offset> nodesTextOffset;
 
-  List<double> nodesOpacity;
-
-  int nodesOpacityTracker;
-
   List<bool> nodesComapringIndicators;
 
   ///how many levels in the tree, starts from 0
@@ -106,8 +102,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
     nodesCenters = List(fullTreeSize);
     nodesTextGlobalKeys = List.generate(treeSize, (_) => GlobalKey());
     nodesTextOffset = List.generate(treeSize, (_) => Offset.zero);
-    nodesOpacity = List.generate(treeSize, (_) => 1);
-    nodesOpacityTracker = nodesOpacity.length - 1;
+
     nodesComapringIndicators = List.generate(treeSize, (_) => false);
   }
 
@@ -220,20 +215,17 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
               .map((index, item) {
                 return MapEntry(
                   index,
-                  Opacity(
-                    opacity: nodesOpacity[index],
-                    child: FixedCircle(
-                      center: nodesCenters[index],
-                      radius: nodeRadius,
-                      border: Border.all(width: 1),
-                      child: Center(
-                        child: FittedBox(
-                          child: Transform.translate(
-                            offset: nodesTextOffset[index],
-                            child: Text(treeItems[index].toString()),
-                          ),
-                          key: nodesTextGlobalKeys[index],
+                  FixedCircle(
+                    center: nodesCenters[index],
+                    radius: nodeRadius,
+                    border: Border.all(width: 1),
+                    child: Center(
+                      child: FittedBox(
+                        child: Transform.translate(
+                          offset: nodesTextOffset[index],
+                          child: Text(treeItems[index].toString()),
                         ),
+                        key: nodesTextGlobalKeys[index],
                       ),
                     ),
                   ),
@@ -267,8 +259,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                           // ),
                           Positioned(
                             left: maxWidth / 2,
-                            child: 2 * key + 1 < treeSize &&
-                                    nodesOpacity[2 * key + 1] == 1
+                            child: 2 * key + 1 < treeSize
                                 ? Line(
                                     color: Colors.black,
                                     start:
@@ -282,8 +273,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                           ),
                           Positioned(
                             left: maxWidth / 2,
-                            child: 2 * key + 2 < treeSize &&
-                                    nodesOpacity[2 * key + 2] == 1
+                            child: 2 * key + 2 < treeSize
                                 ? Line(
                                     color: Colors.black,
                                     start:
@@ -371,15 +361,6 @@ class CompleteBinaryTreeController {
     _state._animationController.removeListener(listner);
 
     _state._animationController.reset();
-  }
-
-  void hideLastNode() {
-    if (_state.nodesOpacityTracker < 0) {
-      return;
-    }
-    _state.setState(() {
-      _state.nodesOpacity[_state.nodesOpacityTracker--] = 0;
-    });
   }
 
   void showComparingIndicators(int index1, int index2) {
