@@ -1,5 +1,6 @@
 import 'package:algo_view/heap_sort/animatable_array.dart';
 import 'package:algo_view/heap_sort/complete_binary_tree.dart';
+import 'package:algo_view/heap_sort/size_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -124,38 +125,17 @@ class _HomePageState extends State<HomePage>
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Size:',
-                          style: TextStyle(fontSize: 15),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        DropdownButton<int>(
-                          value: treeSize,
-                          onChanged: isRunning
-                              ? null
-                              : (_) {
-                                  setState(() {
-                                    treeSize = _;
-                                    randomizeItems();
-                                  });
-                                },
-                          items: List.generate(
-                            14,
-                            (index) => DropdownMenuItem(
-                              value: index + 4,
-                              child: Text((index + 4).toString(),
-                                  style: TextStyle(
-                                    color: Colors.blueAccent,
-                                  )),
-                            ),
-                          ),
-                        ),
-                      ],
+                    SizePicker(
+                      value: treeSize,
+                      onChanged: isRunning
+                          ? null
+                          : (value) {
+                              setState(() {
+                                treeSize = value;
+                                randomizeItems();
+                              });
+                              print(treeSize);
+                            },
                     ),
                     Spacer(
                       flex: 1,
