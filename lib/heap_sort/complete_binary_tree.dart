@@ -330,21 +330,29 @@ class CompleteBinaryTreeController {
     RenderBox child2Box =
         _state.nodesTextGlobalKeys[index2].currentContext.findRenderObject();
     var child2Offset = child2Box.localToGlobal(Offset.zero);
-    Animation<Offset> animation =
-        Tween<Offset>(begin: child1Offset, end: child2Offset)
+
+    double xDistance = child1Offset.dx - child2Offset.dx;
+    double yDistance = child1Offset.dy - child2Offset.dy;
+
+    double child1TotalDx = -xDistance;
+    double child2TotalDx = -child1TotalDx;
+
+    double child1TotalDy = -yDistance;
+    double child2TotalDy = -child1TotalDy;
+
+    Offset newChild1Offset = Offset(child1TotalDx, child1TotalDy);
+    Offset newChild2Offset = Offset(child2TotalDx, child2TotalDy);
+
+    Animation<Offset> index1Animation =
+        Tween<Offset>(begin: Offset.zero, end: newChild1Offset)
+            .animate(_state._animationController);
+    Animation<Offset> index2Animation =
+        Tween<Offset>(begin: Offset.zero, end: newChild2Offset)
             .animate(_state._animationController);
     void listner() {
-      child1Box =
-          _state.nodesTextGlobalKeys[index1].currentContext.findRenderObject();
-      child2Box =
-          _state.nodesTextGlobalKeys[index2].currentContext.findRenderObject();
-      var dx = animation.value.dx - child1Offset.dx;
-      var dy = animation.value.dy - child1Offset.dy;
-      child1Offset = animation.value;
-      child2Offset = child2Offset - Offset(dx, dy);
       _state.setState(() {
-        _state.nodesTextOffset[index1] = child1Box.globalToLocal(child1Offset);
-        _state.nodesTextOffset[index2] = child2Box.globalToLocal(child2Offset);
+        _state.nodesTextOffset[index1] = index1Animation.value;
+        _state.nodesTextOffset[index2] = index2Animation.value;
       });
     }
 
