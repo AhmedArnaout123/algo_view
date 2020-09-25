@@ -1,6 +1,5 @@
 import 'package:algo_view/heap_sort/comparing_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 typedef OnArrayCreated = void Function(AnimatableArrayController);
 
@@ -32,8 +31,6 @@ class _AnimatableArrayState extends State<AnimatableArray>
 
   AnimationController _animationController;
   AnimatableArrayController controller;
-  List<double> dxOffsets;
-  List<double> dyOffsets;
   List<bool> comparingIndicators;
 
   void swipeItems(int i1, i2) {
@@ -48,8 +45,6 @@ class _AnimatableArrayState extends State<AnimatableArray>
     nodesTextGlobalKeys = List.generate(size, (_) => GlobalKey());
     nodesTextOffset = List.generate(size, (_) => Offset.zero);
     widget.onArrayCreated(controller);
-    dxOffsets = List.generate(size, (_) => 0);
-    dyOffsets = List.generate(size, (_) => 0);
     comparingIndicators = List.generate(size, (_) => false);
   }
 
@@ -102,9 +97,8 @@ class _AnimatableArrayState extends State<AnimatableArray>
                           child: Stack(
                             children: [
                               Center(
-                                child: Transform(
-                                  transform: Matrix4.translation(
-                                      Vector3(dxOffsets[k], dyOffsets[k], 0)),
+                                child: Transform.translate(
+                                  offset: nodesTextOffset[k],
                                   child: Text(
                                     items[k].toString(),
                                     key: nodesTextGlobalKeys[k],
@@ -166,10 +160,8 @@ class AnimatableArrayController {
             .animate(_state._animationController);
     void listner() {
       _state.setState(() {
-        _state.dxOffsets[index1] = index1Animation.value.dx;
-        _state.dyOffsets[index1] = index1Animation.value.dy;
-        _state.dxOffsets[index2] = index2Animation.value.dx;
-        _state.dyOffsets[index2] = index2Animation.value.dy;
+        _state.nodesTextOffset[index1] = index1Animation.value;
+        _state.nodesTextOffset[index2] = index2Animation.value;
       });
     }
 
@@ -179,10 +171,8 @@ class AnimatableArrayController {
     _state._animationController.removeListener(listner);
     _state.setState(() {
       _state.swipeItems(index1, index2);
-      _state.dxOffsets[index1] = 0;
-      _state.dxOffsets[index2] = 0;
-      _state.dyOffsets[index1] = 0;
-      _state.dyOffsets[index2] = 0;
+      _state.nodesTextOffset[index1] = Offset.zero;
+      _state.nodesTextOffset[index2] = Offset.zero;
     });
     _state._animationController.reset();
   }
