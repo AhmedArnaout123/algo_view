@@ -313,7 +313,7 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
                         : Container());
               })
               .values
-              .toList()
+              .toList(),
         ],
       );
     });
