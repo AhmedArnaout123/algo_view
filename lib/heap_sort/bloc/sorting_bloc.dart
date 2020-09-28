@@ -24,7 +24,7 @@ class SortingBloc extends Bloc<SortingEvent, SortingState> {
 
   Stream<SortingState> _swapedItemsEventHandler(
       SwapedItemsSortingEvent event) async* {
-    yield SwapingItemsSortingState();
+    yield SwapingItemsSortingState(event.index1, event.index2);
   }
 }
 
@@ -33,10 +33,10 @@ Stream<SortingState> _comparedItemsEventHandler(
 ) async* {
   switch (event.type) {
     case ComparedItemsEventType.ShowComparingIndicator:
-      yield ComparingItemsInProgressSortingState();
+      yield ComparingItemsInProgressSortingState(event.index1, event.index2);
       break;
     case ComparedItemsEventType.HideComparingIndicator:
-      yield ComparingItemsIsDoneSortingState();
+      yield ComparingItemsIsDoneSortingState(event.index1, event.index2);
       break;
   }
 }

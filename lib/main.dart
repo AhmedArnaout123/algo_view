@@ -1,11 +1,19 @@
 import 'package:algo_view/heap_sort/animatable_array.dart';
+import 'package:algo_view/heap_sort/bloc/sorting_bloc.dart';
 import 'package:algo_view/heap_sort/complete_binary_tree.dart';
 import 'package:algo_view/heap_sort/size_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 void main(List<String> args) {
-  runApp(App());
+  runApp(
+    BlocProvider(
+      create: (_) => SortingBloc(),
+      child: App(),
+    ),
+  );
 }
 
 class App extends StatelessWidget {
@@ -47,7 +55,10 @@ class _HomePageState extends State<HomePage>
 
   void swipe(List<int> arr, int i, int j) {
     arrayController.swipeItems(i, j);
-    treeController.swipeItems(i, j);
+    // treeController.swipeItems(i, j);
+    BlocProvider.of<SortingBloc>(context).add(
+      SwapedItemsSortingEvent(index1: i, index2: j),
+    );
     int t = arr[i];
     arr[i] = arr[j];
     arr[j] = t;
@@ -60,11 +71,25 @@ class _HomePageState extends State<HomePage>
   ) {
     if (action == ComparingIndicatorAction.Hide) {
       arrayController.hideComparingIndicators(i, j);
-      treeController.hideComparingIndicators(i, j);
+      // treeController.hideComparingIndicators(i, j);
+      BlocProvider.of<SortingBloc>(context).add(
+        ComparedItemsSortingEvent(
+          index1: i,
+          index2: j,
+          type: ComparedItemsEventType.HideComparingIndicator,
+        ),
+      );
       return;
     }
     arrayController.showComparingIndicators(i, j);
-    treeController.showComparingIndicators(i, j);
+    // treeController.showComparingIndicators(i, j);
+    BlocProvider.of<SortingBloc>(context).add(
+      ComparedItemsSortingEvent(
+        index1: i,
+        index2: j,
+        type: ComparedItemsEventType.ShowComparingIndicator,
+      ),
+    );
   }
 
   Future<void> heapSort(List<int> arr, int start, int end) async {

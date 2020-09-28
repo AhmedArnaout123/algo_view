@@ -5,6 +5,9 @@ import 'package:algo_view/heap_sort/fixed_circle.dart';
 import 'package:algo_view/heap_sort/line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:algo_view/heap_sort/bloc/sorting_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bloc/bloc.dart';
 
 typedef OnTreeCreated = void Function(CompleteBinaryTreeController);
 
@@ -205,116 +208,133 @@ class _CompleteBinaryTreeState extends State<CompleteBinaryTree>
         }
       }
 
-      return Stack(
-        children: <Widget>[
-          // Container(
-          //   color: Colors.blue,
-          // ),
-          ...treeItems
-              .asMap()
-              .map((index, item) {
-                return MapEntry(
-                  index,
-                  FixedCircle(
-                    center: nodesCenters[index],
-                    radius: nodeRadius,
-                    border: Border.all(width: 1),
-                    child: Center(
-                      child: FittedBox(
-                        child: Transform.translate(
-                          offset: nodesTextOffset[index],
-                          child: Text(treeItems[index].toString()),
+      return BlocListener<SortingBloc, SortingState>(
+        listener: (context, state) {
+          if (state is SwapingItemsSortingState) {
+            treeController.swipeItems(state.index1, state.index2);
+            return;
+          }
+          if (state is ComparingItemsInProgressSortingState) {
+            treeController.showComparingIndicators(state.index1, state.index2);
+            return;
+          }
+          if (state is ComparingItemsIsDoneSortingState) {
+            treeController.hideComparingIndicators(state.index1, state.index2);
+          }
+        },
+        child: Stack(
+          children: <Widget>[
+            // Container(
+            //   color: Colors.blue,
+            // ),
+            ...treeItems
+                .asMap()
+                .map((index, item) {
+                  return MapEntry(
+                    index,
+                    FixedCircle(
+                      center: nodesCenters[index],
+                      radius: nodeRadius,
+                      border: Border.all(width: 1),
+                      child: Center(
+                        child: FittedBox(
+                          child: Transform.translate(
+                            offset: nodesTextOffset[index],
+                            child: Text(treeItems[index].toString()),
+                          ),
+                          key: nodesTextGlobalKeys[index],
                         ),
-                        key: nodesTextGlobalKeys[index],
                       ),
                     ),
-                  ),
-                );
-              })
-              .values
-              .toList(),
-          ...nodesCenters
-              .asMap()
-              .map<int, Widget>((key, value) {
-                if (key >= levelCapacityCalculator(treeLevels) - 1) {
-                  return MapEntry(key, Container());
-                }
-                var maxHeight = nodesCenters[2 * key + 1].dy - value.dy;
-                var maxWidth = (nodesCenters[2 * key + 2].dx + nodeRadius) -
-                    (nodesCenters[2 * key + 1].dx - nodeRadius);
-                return MapEntry(
-                  key,
-                  Positioned(
-                    left: nodesCenters[key * 2 + 1].dx - nodeRadius,
-                    top: value.dy + nodeRadius,
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxHeight: maxHeight,
-                        maxWidth: maxWidth,
-                      ),
-                      child: Stack(
-                        children: [
-                          // Container(
-                          //   color: Colors.orange.withOpacity(0.2),
-                          // ),
-                          Positioned(
-                            left: maxWidth / 2,
-                            child: 2 * key + 1 < treeSize
-                                ? Line(
-                                    color: Colors.black,
-                                    start:
-                                        Offset(value.dx, value.dy + nodeRadius),
-                                    end: Offset(
-                                      nodesCenters[2 * key + 2].dx,
-                                      nodesCenters[2 * key + 2].dy - nodeRadius,
-                                    ),
-                                  )
-                                : Container(),
-                          ),
-                          Positioned(
-                            left: maxWidth / 2,
-                            child: 2 * key + 2 < treeSize
-                                ? Line(
-                                    color: Colors.black,
-                                    start:
-                                        Offset(value.dx, value.dy + nodeRadius),
-                                    end: Offset(
-                                      nodesCenters[2 * key + 1].dx,
-                                      nodesCenters[2 * key + 1].dy - nodeRadius,
-                                    ),
-                                  )
-                                : Container(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              })
-              .values
-              .toList(),
-          ...nodesComapringIndicators
-              .asMap()
-              .map((key, value) {
-                return MapEntry(
+                  );
+                })
+                .values
+                .toList(),
+            ...nodesCenters
+                .asMap()
+                .map<int, Widget>((key, value) {
+                  if (key >= levelCapacityCalculator(treeLevels) - 1) {
+                    return MapEntry(key, Container());
+                  }
+                  var maxHeight = nodesCenters[2 * key + 1].dy - value.dy;
+                  var maxWidth = (nodesCenters[2 * key + 2].dx + nodeRadius) -
+                      (nodesCenters[2 * key + 1].dx - nodeRadius);
+                  return MapEntry(
                     key,
-                    value
-                        ? FixedCircle(
-                            center: nodesCenters[key],
-                            radius: nodeRadius + 3,
-                            child: ComparingIndicator(
-                              height: 2 * nodeRadius,
-                              borderWidth: 3,
-                              shape: ComparingIndicatorShape.Circle,
-                              animationDuration:
-                                  widget.comparingIndicatorDuration,
+                    Positioned(
+                      left: nodesCenters[key * 2 + 1].dx - nodeRadius,
+                      top: value.dy + nodeRadius,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: maxHeight,
+                          maxWidth: maxWidth,
+                        ),
+                        child: Stack(
+                          children: [
+                            // Container(
+                            //   color: Colors.orange.withOpacity(0.2),
+                            // ),
+                            Positioned(
+                              left: maxWidth / 2,
+                              child: 2 * key + 1 < treeSize
+                                  ? Line(
+                                      color: Colors.black,
+                                      start: Offset(
+                                          value.dx, value.dy + nodeRadius),
+                                      end: Offset(
+                                        nodesCenters[2 * key + 2].dx,
+                                        nodesCenters[2 * key + 2].dy -
+                                            nodeRadius,
+                                      ),
+                                    )
+                                  : Container(),
                             ),
-                          )
-                        : Container());
-              })
-              .values
-              .toList(),
-        ],
+                            Positioned(
+                              left: maxWidth / 2,
+                              child: 2 * key + 2 < treeSize
+                                  ? Line(
+                                      color: Colors.black,
+                                      start: Offset(
+                                          value.dx, value.dy + nodeRadius),
+                                      end: Offset(
+                                        nodesCenters[2 * key + 1].dx,
+                                        nodesCenters[2 * key + 1].dy -
+                                            nodeRadius,
+                                      ),
+                                    )
+                                  : Container(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                })
+                .values
+                .toList(),
+            ...nodesComapringIndicators
+                .asMap()
+                .map((key, value) {
+                  return MapEntry(
+                      key,
+                      value
+                          ? FixedCircle(
+                              center: nodesCenters[key],
+                              radius: nodeRadius + 3,
+                              child: ComparingIndicator(
+                                height: 2 * nodeRadius,
+                                borderWidth: 3,
+                                shape: ComparingIndicatorShape.Circle,
+                                animationDuration:
+                                    widget.comparingIndicatorDuration,
+                              ),
+                            )
+                          : Container());
+                })
+                .values
+                .toList(),
+          ],
+        ),
       );
     });
   }
