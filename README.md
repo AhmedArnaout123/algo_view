@@ -1,4 +1,4 @@
-# algo_view
+# heap_sort_visualization
 
 A new Flutter project.
 
