@@ -1,6 +1,9 @@
 import 'package:algo_view/heap_sort/comparing_indicator.dart';
 import 'package:flutter/material.dart';
 
+import 'bloc/sorting_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 typedef OnArrayCreated = void Function(AnimatableArrayController);
 
 class AnimatableArray extends StatefulWidget {
@@ -67,65 +70,80 @@ class _AnimatableArrayState extends State<AnimatableArray>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 150,
-      // color: Colors.red.withOpacity(0.2),
-      child: Wrap(
-        direction: Axis.horizontal,
-        spacing: 0,
-        children: [
-          ...items
-              .asMap()
-              .map((k, v) => MapEntry(
-                    k,
-                    Flex(
-                      direction: Axis.vertical,
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(3),
-                          child: Text('${k.toString()}'),
-                        ),
-                        Container(
-                          width: 50,
-                          height: 25,
-                          decoration: BoxDecoration(
-                            border: Border.all(width: 1),
-                          ),
-                          child: Stack(
-                            children: [
-                              Center(
-                                child: Transform.translate(
-                                  offset: nodesTextOffset[k],
-                                  child: Text(
-                                    items[k].toString(),
-                                    key: nodesTextGlobalKeys[k],
-                                  ),
-                                ),
+    return BlocListener<SortingBloc, SortingState>(
+        listener: (context, state) {
+          if (state is SwapingItemsSortingState) {
+            controller.swipeItems(state.index1, state.index2);
+            return;
+          }
+          if (state is ComparingItemsInProgressSortingState) {
+            controller.showComparingIndicators(state.index1, state.index2);
+            return;
+          }
+          if (state is ComparingItemsIsDoneSortingState) {
+            controller.hideComparingIndicators(state.index1, state.index2);
+          }
+        },
+        child: Container(
+          height: 150,
+          // color: Colors.red.withOpacity(0.2),
+          child: Wrap(
+            direction: Axis.horizontal,
+            spacing: 0,
+            children: [
+              ...items
+                  .asMap()
+                  .map((k, v) => MapEntry(
+                        k,
+                        Flex(
+                          direction: Axis.vertical,
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(3),
+                              child: Text('${k.toString()}'),
+                            ),
+                            Container(
+                              width: 50,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 1),
                               ),
-                              if (comparingIndicators[k])
-                                LayoutBuilder(
-                                  builder: (_, c) => ComparingIndicator(
-                                    borderWidth: 2,
-                                    height: c.maxHeight,
-                                    width: c.maxWidth,
-                                    shape: ComparingIndicatorShape.Rectangle,
-                                    animationDuration:
-                                        widget.comparingIndicatorDuration,
+                              child: Stack(
+                                children: [
+                                  Center(
+                                    child: Transform.translate(
+                                      offset: nodesTextOffset[k],
+                                      child: Text(
+                                        items[k].toString(),
+                                        key: nodesTextGlobalKeys[k],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                            ],
-                          ),
+                                  if (comparingIndicators[k])
+                                    LayoutBuilder(
+                                      builder: (_, c) => ComparingIndicator(
+                                        borderWidth: 2,
+                                        height: c.maxHeight,
+                                        width: c.maxWidth,
+                                        shape:
+                                            ComparingIndicatorShape.Rectangle,
+                                        animationDuration:
+                                            widget.comparingIndicatorDuration,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ))
-              .values
-        ],
-      ),
-    );
+                      ))
+                  .values
+            ],
+          ),
+        ));
   }
 }
 

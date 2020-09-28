@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage>
   }
 
   void swipe(List<int> arr, int i, int j) {
-    arrayController.swipeItems(i, j);
+    // arrayController.swipeItems(i, j);
     // treeController.swipeItems(i, j);
     BlocProvider.of<SortingBloc>(context).add(
       SwapedItemsSortingEvent(index1: i, index2: j),
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage>
     int j,
   ) {
     if (action == ComparingIndicatorAction.Hide) {
-      arrayController.hideComparingIndicators(i, j);
+      // arrayController.hideComparingIndicators(i, j);
       // treeController.hideComparingIndicators(i, j);
       BlocProvider.of<SortingBloc>(context).add(
         ComparedItemsSortingEvent(
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage>
       );
       return;
     }
-    arrayController.showComparingIndicators(i, j);
+    // arrayController.showComparingIndicators(i, j);
     // treeController.showComparingIndicators(i, j);
     BlocProvider.of<SortingBloc>(context).add(
       ComparedItemsSortingEvent(
