@@ -116,9 +116,16 @@ class UISortingDataProvider {
   List<GlobalKey> itemsWidgetsGlobalKeys;
   List<bool> haveItemsComparingIndicators;
 
-  UISortingDataProvider(
-      {@required this.items,
-      @required this.haveItemsComparingIndicators,
-      @required this.itemsWidgetsGlobalKeys,
-      @required this.itemsWidgetsOffsets});
+  UISortingDataProvider({@required List<int> items}) {
+    initilizeData(items);
+  }
+
+  int get size => items.length;
+
+  void initilizeData(List<int> items) {
+    items = List.from(items);
+    haveItemsComparingIndicators = List.generate(size, (index) => false);
+    itemsWidgetsGlobalKeys = List.generate(size, (index) => GlobalKey());
+    itemsWidgetsOffsets = List.generate(size, (index) => Offset.zero);
+  }
 }
