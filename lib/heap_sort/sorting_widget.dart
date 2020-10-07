@@ -58,8 +58,6 @@ class _SortingWidgetState extends State<SortingWidget>
         .itemsWidgetsGlobalKeys[index2].currentContext
         .findRenderObject();
     var child2Offset = child2Box.localToGlobal(Offset.zero);
-    print('child$index1 from sorting widget $child1Offset');
-    print('child$index2 from sorting widget $child2Offset');
 
     double xDistance = child1Offset.dx - child2Offset.dx;
     double yDistance = child1Offset.dy - child2Offset.dy;
@@ -153,7 +151,9 @@ class _SortingWidgetState extends State<SortingWidget>
             ? AnimatableArray(
                 comparingIndicatorDuration: widget.comparingIndicatorDuration,
               )
-            : CompleteBinaryTree(),
+            : CompleteBinaryTree(
+                comparingIndicatorDuration: widget.comparingIndicatorDuration,
+              ),
       ),
     );
   }

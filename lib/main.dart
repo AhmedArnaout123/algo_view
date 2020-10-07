@@ -38,8 +38,7 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int treeSize = 8;
   List<int> items;
-  CompleteBinaryTreeController treeController;
-  // AnimatableArrayController arrayController;
+
   Duration comparingIndicatorDuration = Duration(milliseconds: 400);
   Duration swipingDuration = Duration(milliseconds: 300);
   bool isRunning = false;
@@ -235,13 +234,11 @@ class _HomePageState extends State<HomePage>
               Container(
                 // padding: EdgeInsets.symmetric(horizontal: 10),
                 height: 300,
-                child: CompleteBinaryTree(
+                child: SortingWidget(
                   items: items,
-                  onTreeCreated: (c) {
-                    treeController = c;
-                  },
+                  layout: SortingWidgetLayout.tree,
                   comparingIndicatorDuration: comparingIndicatorDuration,
-                  swipingAnimationDuration: swipingDuration,
+                  swapingDuration: swipingDuration,
                 ),
               ),
               SizedBox(height: 20),
