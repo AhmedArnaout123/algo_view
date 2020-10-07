@@ -2,6 +2,7 @@ import 'package:algo_view/heap_sort/animatable_array.dart';
 import 'package:algo_view/heap_sort/bloc/sorting_bloc.dart';
 import 'package:algo_view/heap_sort/complete_binary_tree.dart';
 import 'package:algo_view/heap_sort/size_picker.dart';
+import 'package:algo_view/heap_sort/sorting_widget.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage>
   int treeSize = 8;
   List<int> items;
   CompleteBinaryTreeController treeController;
-  AnimatableArrayController arrayController;
+  // AnimatableArrayController arrayController;
   Duration comparingIndicatorDuration = Duration(milliseconds: 400);
   Duration swipingDuration = Duration(milliseconds: 300);
   bool isRunning = false;
@@ -244,14 +245,26 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
               SizedBox(height: 20),
-              AnimatableArray(
+              SortingWidget(
+                layout: SortingWidgetLayout.array,
                 items: items,
-                onArrayCreated: (c) {
-                  arrayController = c;
-                },
+                swapingDuration: swipingDuration,
                 comparingIndicatorDuration: comparingIndicatorDuration,
-                swipingDuration: swipingDuration,
               ),
+              RaisedButton(
+                onPressed: () {
+                  BlocProvider.of<SortingBloc>(context)
+                      .add(SwapedItemsSortingEvent(index1: 0, index2: 1));
+                },
+              )
+              // AnimatableArray(
+              //   items: items,
+              //   // onArrayCreated: (c) {
+              //   //   arrayController = c;
+              //   // },
+              //   comparingIndicatorDuration: comparingIndicatorDuration,
+              //   swipingDuration: swipingDuration,
+              // ),
             ],
           ),
         ),
