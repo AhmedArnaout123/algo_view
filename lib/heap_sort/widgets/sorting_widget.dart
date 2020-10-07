@@ -1,9 +1,9 @@
-import 'package:algo_view/heap_sort/animatable_array.dart';
-import 'package:algo_view/heap_sort/complete_binary_tree.dart';
+import 'package:algo_view/heap_sort/widgets/animatable_array.dart';
+import 'package:algo_view/heap_sort/widgets/complete_binary_tree.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'bloc/sorting_bloc.dart';
+import '../bloc/sorting_bloc.dart';
 
 enum SortingWidgetLayout { tree, array }
 

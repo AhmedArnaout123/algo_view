@@ -2,10 +2,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:algo_view/heap_sort/comparing_indicator.dart';
-import 'package:algo_view/heap_sort/fixed_circle.dart';
-import 'package:algo_view/heap_sort/line.dart';
-import 'package:algo_view/heap_sort/sorting_widget.dart';
+import 'package:algo_view/heap_sort/widgets/comparing_indicator.dart';
+import 'package:algo_view/heap_sort/widgets/fixed_circle.dart';
+import 'package:algo_view/heap_sort/widgets/line.dart';
+import 'package:algo_view/heap_sort/widgets/sorting_widget.dart';
 
 class CompleteBinaryTree extends StatelessWidget {
   final List<int> items;

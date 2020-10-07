@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:algo_view/heap_sort/comparing_indicator.dart';
-import 'package:algo_view/heap_sort/sorting_widget.dart';
+import 'package:algo_view/heap_sort/widgets/comparing_indicator.dart';
+import 'package:algo_view/heap_sort/widgets/sorting_widget.dart';
 
 class AnimatableArray extends StatelessWidget {
   final Duration comparingIndicatorDuration;
