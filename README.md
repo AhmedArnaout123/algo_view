@@ -1,16 +1,6 @@
-# heap_sort_visualization
+![Heap Sort Visualization. Note: the animation looks slow because of the gif file, you can follow the link bellow to see how the app perform](https://github.com/AhmedArnaout123/gifs/blob/main/heap%20sort/20201113_171247.gif)
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+this app visualizes the steps of the heap sort alogrithm.
+you can choose the tree size and randomize items.
+see the videos: https://drive.google.com/file/d/1JDucL4b2REcHcqCtpfIR2MsxFMAgLhn2/view?usp=sharing 
+                https://drive.google.com/file/d/1h-3yk_uqL4evOxBYDXDbEPPFHWbsbXXk/view?usp=sharing
