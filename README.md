@@ -2,5 +2,7 @@
 
 this app visualizes the steps of the heap sort alogrithm.
 you can choose the tree size and randomize items.
-see the videos: https://drive.google.com/file/d/1JDucL4b2REcHcqCtpfIR2MsxFMAgLhn2/view?usp=sharing 
-                https://drive.google.com/file/d/1h-3yk_uqL4evOxBYDXDbEPPFHWbsbXXk/view?usp=sharing
+see the videos:
+https://drive.google.com/file/d/1JDucL4b2REcHcqCtpfIR2MsxFMAgLhn2/view?usp=sharing  
+
+https://drive.google.com/file/d/1h-3yk_uqL4evOxBYDXDbEPPFHWbsbXXk/view?usp=sharing
