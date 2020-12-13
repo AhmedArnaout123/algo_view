@@ -8,9 +8,9 @@ Notes:
 
 1- The size of the nodes is responsive which means if you choose a tree with levels number less than 3 the size of the node will be bigger and if you choose a tree with levels number more than 3 the size of the node will be much smaller.
 
-2- Althoug when you play with th tree levels the UI doesn't look so good but the challenge and the goal were to come with a responsive layout.
+2- Althoug when you change the tree levels number the UI doesn't look so good, but the challenge and the goal were to come with a responsive layout.
 
-3- The animation looks slow here because of the gif file but the app runs well and the animation is smooth, you can check screen records bellow :
+3- The animation might look slow here because of the gif file but the app runs well and the animation is smooth, you can check the screen records bellow :
 
 https://drive.google.com/file/d/1JDucL4b2REcHcqCtpfIR2MsxFMAgLhn2/view?usp=sharing  
 
